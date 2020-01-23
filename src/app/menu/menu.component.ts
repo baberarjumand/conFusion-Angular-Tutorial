@@ -21,7 +21,12 @@ export class MenuComponent implements OnInit {
   // life cycle method
   ngOnInit() {
     // this.dishes = this.dishService.getDishes();
-    this.dishService.getDishes().then((dishes) => this.dishes = dishes);
+
+    // use promise
+    // this.dishService.getDishes().then((dishes) => this.dishes = dishes);
+
+    // use observable
+    this.dishService.getDishes().subscribe(dishes => this.dishes = dishes);
   }
 
   onSelect(dish: Dish) {
