@@ -3,6 +3,7 @@ import { Dish } from './../shared/dish';
 import { Component, OnInit, Input } from '@angular/core';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
+import { switchMap } from 'rxjs/operators';
 
 // const DISH = {
 //   id: '0',
@@ -57,20 +58,36 @@ export class DishdetailComponent implements OnInit {
 
     // @Input() // this is not needed anymore when using route parameters
     dish: Dish;
+    dishIds: string[];
+    prev: string;
+    next: string;
 
     constructor(private dishService: DishService,
                 private location: Location,
                 private route: ActivatedRoute) { }
 
     ngOnInit() {
-      const id = this.route.snapshot.params['id'];
+      // const id = this.route.snapshot.params['id'];
+      
       // this.dish = this.dishService.getDish(id);
 
       // use promise
       // this.dishService.getDish(id).then(dish => this.dish = dish);
 
       // use observable
-      this.dishService.getDish(id).subscribe(dish => this.dish = dish);
+      // this.dishService.getDish(id).subscribe(dish => this.dish = dish);
+
+      // use route params to enable prev/next dish
+      this.dishService.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
+      this.route.params
+        .pipe(switchMap((params: Params) => this.dishService.getDish(params['id'])))
+        .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); });
+    }
+
+    setPrevNext(dishId: string) {
+      const index = this.dishIds.indexOf(dishId);
+      this.prev = this.dishIds[(this.dishIds.length + index - 1) % this.dishIds.length];
+      this.next = this.dishIds[(this.dishIds.length + index + 1) % this.dishIds.length];
     }
 
     goBack(): void {
