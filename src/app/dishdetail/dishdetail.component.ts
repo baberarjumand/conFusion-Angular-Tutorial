@@ -1,6 +1,7 @@
+import { Comment } from './../shared/comment';
 import { DishService } from './../services/dish.service';
 import { Dish } from './../shared/dish';
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Inject } from '@angular/core';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { switchMap } from 'rxjs/operators';
@@ -70,7 +71,7 @@ export class DishdetailComponent implements OnInit {
     formErrors = {
       'author': '',
       'comment': ''
-    }
+    };
 
     validationMessages = {
       'author': {
@@ -82,16 +83,17 @@ export class DishdetailComponent implements OnInit {
         'required': 'Author Name is required.',
         'maxlength': 'Author Name cannot be more than 500 characters long.'
       }
-    }
+    };
 
     constructor(private dishService: DishService,
                 private location: Location,
                 private route: ActivatedRoute,
-                private fb: FormBuilder) { }
+                private fb: FormBuilder,
+                @Inject('BaseURL') private BaseURL) { }
 
     ngOnInit() {
       // const id = this.route.snapshot.params['id'];
-      
+
       // this.dish = this.dishService.getDish(id);
 
       // use promise
@@ -131,12 +133,12 @@ export class DishdetailComponent implements OnInit {
       this.onValueChanged(); // (re)set validation messages now
     }
 
-    onSubmit() {      
+    onSubmit() {
       const tempDate = new Date();
       this.comment = this.commentForm.value;
       this.comment.date = tempDate.toISOString();
       console.log(this.comment);
-      this.dish.comments.push(this.comment);      
+      this.dish.comments.push(this.comment);
       this.commentForm.reset({
         author: '',
         rating: 5,
@@ -163,6 +165,6 @@ export class DishdetailComponent implements OnInit {
           }
         }
       }
-    }    
+    }
 
 }
