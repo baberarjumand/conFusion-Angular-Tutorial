@@ -1,7 +1,10 @@
+import { switchMap } from 'rxjs/operators';
+import { ActivatedRoute, Params } from '@angular/router';
+import { FeedbackService } from './../services/feedback.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
-import { flyInOut } from '../animations/app.animation';
+import { flyInOut, visibility, expand } from '../animations/app.animation';
 
 @Component({
   selector: 'app-contact',
@@ -13,15 +16,23 @@ import { flyInOut } from '../animations/app.animation';
     'style': 'display: block;'
   },
   animations: [
-    flyInOut()
+    flyInOut(),
+    visibility(),
+    expand()
   ]
 })
 export class ContactComponent implements OnInit {
 
   feedbackForm: FormGroup;
   feedback: Feedback;
+  feedbackCopy: Feedback;
   contactType = ContactType;
+  errMess: string;
   @ViewChild('fform') feedbackFormDirective;
+  formVisibility = 'shown';
+  responseVisibility = 'hidden';
+  submittingVisibility = 'hidden';
+  // isSubmitting = false;
 
   formErrors = {
     'firstname': '',
@@ -51,11 +62,24 @@ export class ContactComponent implements OnInit {
     },
   };
 
-  constructor(private fb: FormBuilder) {
-    this.createForm();
-  }
+  constructor(private fb: FormBuilder,
+              private feedbackService: FeedbackService,
+              private route: ActivatedRoute) {  }
 
   ngOnInit() {
+    // this.route.params.pipe(switchMap((params: Params) => {
+    //   // on submit, response submitted to server
+    //   this.formVisibility = 'hidden';
+    //   this.responseVisibility = 'shown';
+    //   return this.feedbackService.getFeedback(params[2]);
+    // })).subscribe(feedback => {
+    //   // this executes when response received from serve
+    //   this.feedback = feedback;
+    //   this.feedbackCopy = feedback;
+    //   this.responseVisibility = 'hidden';
+    //   this.formVisibility = 'shown';
+    // }, errmess => this.errMess = <any>errmess);
+    this.createForm();
   }
 
   createForm() {
@@ -77,7 +101,26 @@ export class ContactComponent implements OnInit {
 
   onSubmit() {
     this.feedback = this.feedbackForm.value;
+    this.feedbackCopy = this.feedback;
     console.log(this.feedback);
+    this.formVisibility = 'hidden';
+    this.submittingVisibility = 'shown';
+    // this.isSubmitting = true;
+    this.feedbackService.submitFeedback(this.feedbackCopy)
+      .subscribe(feedback => {
+        this.feedback = feedback;
+        this.feedbackCopy = feedback;
+        this.submittingVisibility = 'hidden';
+        this.responseVisibility = 'shown';
+        setTimeout(() => {
+          this.feedback = null;
+          this.responseVisibility = 'hidden';
+          this.formVisibility = 'shown';
+        }, 5000);
+        // this.isSubmitting = false;
+      },
+      errMess => { this.feedback = null; this.feedbackCopy = null; this.errMess = <any>errMess; });
+    this.feedbackFormDirective.resetForm();
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',
@@ -87,7 +130,6 @@ export class ContactComponent implements OnInit {
       contacttype: 'None',
       message: ''
     });
-    this.feedbackFormDirective.resetForm();
   }
 
   onValueChanged(data?: any) {

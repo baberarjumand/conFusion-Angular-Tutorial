@@ -89,7 +89,7 @@ export class DishService {
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getDish(id: number): Observable<Dish> {
+  getDish(id: string): Observable<Dish> {
     return this.http.get<Dish>(baseURL + 'dishes/' + id)
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
@@ -99,7 +99,7 @@ export class DishService {
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getDishIds(): Observable<number[] | any> {
+  getDishIds(): Observable<string[] | any> {
     return this.getDishes().pipe(map(dishes => dishes.map(dish => dish.id)))
       .pipe(catchError(error => error));
   }
