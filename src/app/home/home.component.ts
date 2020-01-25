@@ -5,11 +5,21 @@ import { Promotion } from './../shared/promotion';
 import { DishService } from './../services/dish.service';
 import { Dish } from './../shared/dish';
 import { Component, OnInit, Inject } from '@angular/core';
+import { flyInOut, expand } from '../animations/app.animation';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  // tslint:disable-next-line:use-host-property-decorator
+  host: {
+    '[@flyInOut]': 'true',
+    'style': 'display: block;'
+  },
+  animations: [
+    flyInOut(),
+    expand()
+  ]
 })
 export class HomeComponent implements OnInit {
 
