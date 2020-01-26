@@ -1,3 +1,7 @@
+# conFusion-Angular-Tutorial
+
+This project was created as part of Course 2 (Front-End JavaScript Frameworks: Angular) of the Full Stack Web and Multiplatform Mobile App Development specialization on Coursera.
+
 # ConFusion
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.1.
